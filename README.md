@@ -1,5 +1,5 @@
-# mygit
-SSM小米商城
+
+# SSM小米商城
 
 开发环境：idea+JDK 1.8+Tomcat 8.5+MySQL
 

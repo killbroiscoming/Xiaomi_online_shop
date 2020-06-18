@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+
+
+    <!--导入属性配置-->
+    <properties resource="datasource.properties"></properties>
+
+    <!-- 指定数据库驱动的jdbc驱动jar包的位置 -->
+    <!--<classPathEntry location="${db.driverLocation}" />-->
+
+        <context id="DB2Tables"    targetRuntime="MyBatis3">
+
+
+    <!-- 数据库连接地址账号和密码-->
+            <jdbcConnection driverClass="${db.driverClassName}"
+                            connectionURL="${db.url}"
+                            userId="${db.username}"
+                            password="${db.password}">
+            </jdbcConnection>
+
+
+
+            <!--  配置解析规则  默认-->
+        <javaTypeResolver >
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+
+        <!--  生成Model实体类 存放位置 -->
+        <javaModelGenerator targetPackage="com.xiaomi.entry" targetProject=".\src\main\java">
+            <property name="enableSubPackages" value="true" />
+            <property name="trimStrings" value="true" />
+        </javaModelGenerator>
+
+            <!-- mapper文件-->
+        <sqlMapGenerator targetPackage="mapper"  targetProject=".\src\main\resources">
+            <property name="enableSubPackages" value="true" />
+        </sqlMapGenerator>
+
+            <!--  dao -->
+        <javaClientGenerator type="XMLMAPPER"
+                             targetPackage="com.xiaomi.dao"
+                             targetProject=".\src\main\java">
+            <property name="enableSubPackages" value="true" />
+        </javaClientGenerator>
+
+            <!-- 映射关系-->
+        <table tableName="consumer" domainObjectName="Consumer"></table>
+        <table tableName="goods" domainObjectName="Goods"></table>
+        <table tableName="goods_images" domainObjectName="GoodsImage"></table>
+        <table tableName="goods_type" domainObjectName="GoodsType"></table>
+        <table tableName="goods_sevice" domainObjectName="GoodsService"></table>
+        <table tableName="goods_package" domainObjectName="GoodsPackage"></table>
+        <table tableName="goods_configure" domainObjectName="GoodsConfigure"></table>
+        <table tableName="goods_cart" domainObjectName="GoodsCart"></table>
+        <table tableName="goods_order" domainObjectName="GoodsOrder"></table>
+        <table tableName="goods_order_item" domainObjectName="GoodsOrderItem"></table>
+        <table tableName="goods_shopping_address" domainObjectName="GoodsShoppingAddress"></table>
+
+    </context>
+</generatorConfiguration>

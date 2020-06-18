@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/cache"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/cache
+		http://www.springframework.org/schema/cache/spring-cache.xsd">
+
+
+    <!--  1、自动扫描配置 -->
+<context:component-scan base-package="com.xiaomi">
+    <!-- Spring不扫描控制器 -->
+    <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+
+</context:component-scan>
+
+
+    <!--  2 . 引入数据源配置 -->
+    <context:property-placeholder location="classpath:datasource.properties"/>
+
+<!-- 数据源配置：c3p0  -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+
+            <!-- 数据库驱动-->
+    <property name="driverClass" value="${db.driverClassName}"/>
+
+        <!-- 数据库连接串 -->
+    <property name="jdbcUrl" value="${db.url}"/>
+
+        <!-- 数据库用户 -->
+    <property name="user" value="${db.username}"/>
+
+        <!-- 数据库密码 -->
+        <property name="password" value="${db.password}"/>
+
+        <!-- 最小连接数 -->
+    <property name="minPoolSize" value="${db.minPoolSize}"/>
+
+        <!--  最大连接数 -->
+    <property name="maxPoolSize" value="${db.maxPoolSize}"/>
+
+        <!-- 最大空闲的时间，单位是秒，无用的链接再过时后会被回收-->
+    <property name="maxIdleTime" value="${db.maxIdleTime}"/>
+
+        <!-- 数据库连接池初始化时获取的连接数 -->
+    <property name="initialPoolSize" value="${db.initialPoolSize}"/>
+
+        <!-- 在当前连接数耗尽的时候，一次获取的新的连接数 -->
+    <property name="acquireIncrement" value="${db.acquireIncrement}"/>
+
+        <!--  每隔1800s检查数据库空闲连接-->
+    <property name="idleConnectionTestPeriod" value="${db.idleConnectionTestPeriod}"/>
+
+        <!--  当数据库连接失败以后尝试，重新连接的次数 -->
+    <property name="acquireRetryAttempts" value="${db.acquireRetryAttempts}"/>
+
+    </bean>
+
+    <!--  3、配置mybatis整合-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+
+        <!--  mybatis全局配置文件 -->
+        <property name="configLocation" value="classpath:SqlMapConfig.xml"></property>
+
+        <!--  配置数据源 -->
+        <property name="dataSource" ref="dataSource"></property>
+
+        <!--  配置扫描mapper-->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+
+    </bean>
+
+    <!--  配置扫描器，将mybatis接口实现加入到ioc容器中-->
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 扫描所有的dao接口实现，加入到ioc容器中 -->
+        <property name="basePackage" value="com.xiaomi.dao"/>
+    </bean>
+
+    <!--  4、事务控制  -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--  数据源-->
+        <property name="dataSource" ref="dataSource"></property>
+
+    </bean>
+
+    <!--  开启注解支持的事务控制，比较重要的使用配置实现 -->
+    <aop:config>
+        <!--  配置切入点-->
+        <aop:pointcut id="txPoint" expression="execution(* com.xiaomi.service..*(..))"/>
+
+        <!-- 配置事务增强 -->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPoint"></aop:advisor>
+
+    </aop:config>
+
+    <!--  配置事务增强 -->
+    <tx:advice id="txAdvice">
+        <tx:attributes>
+            <!--  所有方法都是事务方法-->
+            <tx:method name="*" />
+            <!--  所有get开头的方法，配置优化-->
+            <tx:method name="get*" read-only="true"></tx:method>
+        </tx:attributes>
+
+    </tx:advice>
+
+
+
+
+
+</beans>
